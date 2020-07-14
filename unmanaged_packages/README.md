@@ -3,7 +3,7 @@
 This is a script to run an ansible playbook which runs all the relevant install tasks in `--check` mode, and reports a list of packages that have NOT been installed by the playbook, but have been manually installed on the system, for each play.
 
 ```bash
-$ ansible-playbok site.yml -i inventory.yml --ask-sudo-pass --tags package-installs
+$ python unmanaged_packages.py site.yml -i inventory.yml --ask-sudo-pass --tags package-installs
 ...
 UNMANAGED PACKAGE LIST ************************************************
 localhost:

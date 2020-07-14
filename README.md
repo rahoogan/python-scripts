@@ -2,14 +2,6 @@
 
 A collection of useful python utility scripts
 
-### Index
-
-|--- [1. Generate README.md
-](generate_readme/README.md)
-
-|--- [2. Create PDF
-](create_pdf/README.md)
-
 # 1. Generate README.md
 
 Generate a README.md file with summaries of READMEs in sub-directories
@@ -34,7 +26,26 @@ optional arguments:
 
 
 
-# 2. Create PDF
+# 2. Ansible Playbook: Check Unmanaged Packages
+
+This is a script to run an ansible playbook which runs all the relevant install tasks in `--check` mode, and reports a list of packages that have NOT been installed by the playbook, but have been manually installed on the system, for each play.
+
+```bash
+$ ansible-playbok site.yml -i inventory.yml --ask-sudo-pass --tags package-installs
+...
+UNMANAGED PACKAGE LIST ************************************************
+localhost:
+  - sqlite3
+  - libsigc++-2.0-0v5
+  - build-essential
+  - jekyll
+  - libxkbcommon-x11-0
+192.168.1.3:
+  - net-tools
+  - packer
+```
+
+# 3. Create PDF
 
 Simple script to create a pdf file by merging images or other pdf documents
 
