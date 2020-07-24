@@ -67,7 +67,7 @@ def generate(args):
                 subsection_title, subsection_lines = get_summary(f)
                 subsection_title = subsection_title.replace('#', f'{str(num)}.')
                 index.append(f'|--- [{subsection_title}]({os.path.relpath(subfile, args.repodir)})\n\n')
-                subsection.append(f'# {subsection_title}')
+                subsection.append(f'## {subsection_title}')
                 subsection += subsection_lines
                 subsection.append('\n\n')
             num+=1
