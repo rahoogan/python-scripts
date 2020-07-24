@@ -86,7 +86,8 @@ class CallbackModule(DefaultCallbackModule):
                     if h not in self.package_info:
                         self.package_info[h] = {
                             "manual": set(),
-                            "managed": set()
+                            "managed": set(),
+                            "failed": False
                         }
                     # Handle multiple packages being installed
                     if isinstance(package_name, list):
@@ -103,9 +104,23 @@ class CallbackModule(DefaultCallbackModule):
             if h not in self.package_info:
                 self.package_info[h] = {
                             "manual": set(),
-                            "managed": set()
+                            "managed": set(),
+                            "failed": False
                         }
             self.package_info[h]["manual"].update(packages)
+
+    def v2_runner_on_failed(self, result, ignore_errors=False):
+        h = result._host.get_name()
+        if h not in self.package_info:
+            self.package_info[h] = {
+                    "manual": set(),
+                    "managed": set(),
+                    "failed": True
+            }
+        else:
+            self.package_info[h]["failed"] = True
+
+        super(CallbackModule, self).v2_runner_on_failed(result)
 
     def v2_playbook_on_stats(self, stats):
         if self._display.verbosity:
@@ -118,6 +133,18 @@ class CallbackModule(DefaultCallbackModule):
     def v2_runner_item_on_ok(self, result):
         if self._display.verbosity:
             super(CallbackModule, self).v2_runner_item_on_ok(result)
+
+    def v2_runner_item_on_failed(self, result):
+        h = result._host.get_name()
+        if h not in self.package_info:
+            self.package_info[h] = {
+                    "manual": set(),
+                    "managed": set(),
+                    "failed": True
+            }
+        else:
+            self.package_info[h]["failed"] = True
+        super(CallbackModule, self).v2_runner_item_on_failed(result)
 
 # Initialise our custom callback
 results_callback = CallbackModule()
@@ -279,6 +306,10 @@ else:
 results_callback._display.banner("UNMANAGED PACKAGE LIST")
 # Print summary of results
 for hostname, value in results_callback.package_info.items():
-    print("%s:" % stringc(hostname, "green"))
-    for p in results_callback.package_info[hostname]['manual'] - results_callback.package_info[hostname]['managed']:
-        print("  - %s" % p)
+    if not results_callback.package_info[hostname]['failed']:
+        print("SUCCESS => %s:" % stringc(hostname, "green"))
+        for p in results_callback.package_info[hostname]['manual'] - results_callback.package_info[hostname]['managed']:
+            print("  - %s" % p)
+    else:
+        print("FAILED => %s:" % stringc(hostname, "red"))
+
